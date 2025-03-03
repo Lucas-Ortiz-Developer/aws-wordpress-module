@@ -6,8 +6,8 @@ resource "aws_db_instance" "wordpress_db_instance" {
     instance_class       = "db.t2.micro"
     identifier           = "${var.cliente}-${var.environment}-wordpress-db"
     username             = "admin"
-    password             = "" #colocar a senha no secrets manager
-    parameter_group_name = "default.mysql5.7"
+    password             = aws_kms_key.rds_key.key_id
+    parameter_group_name = "default.mysql8.0"
     publicly_accessible  = false
     skip_final_snapshot  = true
     vpc_security_group_ids = [aws_security_group.rds_sg.id]
@@ -19,5 +19,14 @@ resource "aws_db_instance" "wordpress_db_instance" {
         Terraform   = "true"
     }
     
+  
+}
+
+resource "aws_kms_key" "rds_key" {
+    description = "KMS key for RDS"
+    enable_key_rotation     = true
+    tags = {
+        Name = "rds_key"
+    }
   
 }
